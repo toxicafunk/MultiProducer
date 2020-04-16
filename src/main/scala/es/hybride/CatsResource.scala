@@ -1,10 +1,11 @@
 package es.hybride
 
+import cats.effect.{ExitCode, IO, IOApp, Resource}
 import cats.implicits._
-import scala.io.Source
-import cats.effect.{ExitCode, IO, IOApp}
 
-object Main extends IOApp {
+import scala.io.Source
+
+object CatsResource extends IOApp {
 
   type Key = String
   type DeviceType = String
@@ -24,7 +25,7 @@ object Main extends IOApp {
     IO(lines.map(dataExtractor))*/
 
   private def readFile(fileName: String) = //: List[(Key, Option[DeviceType])] =
-    IO(Source.fromFile(fileName).getLines().toList)
+    Resource.make(IO(Source.fromFile(fileName)))(res => IO(res.close()))
 
   /*def main(args: Array[String]): Unit = {
     val program = for {
@@ -38,13 +39,11 @@ object Main extends IOApp {
   }*/
 
   override def run(args: List[String]): IO[ExitCode] = {
+    val res = readFile("just5k.json")
     val program = for {
-      iol <- readFile("just5k.json")
-      ext  <- iol.traverse(s => dataExtractor(s))
-    } yield {
-      ext.take(5).map(println)
-    }
+      iol <- res.use(_.getLines().toList.traverse(s => dataExtractor(s)))
+    } yield iol.take(5).map(println)
 
-    program.as(ExitCode.Success)
+      program.as(ExitCode.Success)
   }
 }

@@ -1,8 +1,9 @@
 package es.hybride
 
+import scala.collection.immutable
 import scala.io.Source
 
-object Main {
+object StreamMain {
 
   type Key = String
   type DeviceType = String
@@ -18,11 +19,14 @@ object Main {
     (key, deviceType)
   }
 
-  private def readFile(fileName: String): List[(Key, Option[DeviceType])] = //: List[(Key, Option[DeviceType])] =
-    Source.fromFile(fileName).getLines().map(dataExtractor).toList
+  private def readFile(fileName: String): Stream[(Key, Option[DeviceType])] =
+    Source.fromFile(fileName).getLines().map(dataExtractor).toStream
 
   def main(args: Array[String]): Unit = {
-    readFile("just1M.json").foreach(println)
+    var i = 0
+  readFile("just1M.json").take(1000000).foreach(println)
+    println(i)
+    //Thread.sleep(2000)
   }
 
 }

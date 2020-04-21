@@ -7,14 +7,17 @@ object Main {
   type Key = String
   type DeviceType = String
 
-  private def dataExtractor(line: String): (Key, Option[DeviceType]) = {
+  def dataExtractor(line: String): (Key, Option[DeviceType]) = {
     val keyIdx = line.indexOf("id") + 5
-    val deviceTypeIdx = line.indexOf("\"devicetype\":") + 15
-    val deviceTypeEndIdx = line.indexOf("\"", deviceTypeIdx)
+    val deviceTypeIdx = line.indexOf("\"devicetype\":")
     val key = line.substring(keyIdx, keyIdx + 40)
-    val deviceType: Option[String] = if (deviceTypeIdx != -1)
-      Some(line.substring(deviceTypeIdx, deviceTypeEndIdx))
-      else None
+    val deviceType: Option[String] =
+      if (deviceTypeIdx == -1) None
+      else {
+        val deviceTypeEndIdx = line.indexOf("\"", deviceTypeIdx + 15)
+        Some(line.substring(deviceTypeIdx + 15, deviceTypeEndIdx))
+      }
+
     (key, deviceType)
   }
 

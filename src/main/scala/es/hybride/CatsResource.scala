@@ -42,7 +42,7 @@ object CatsResource extends IOApp {
     val res = readFile("just5k.json")
     val program = for {
       iol <- res.use(_.getLines().toList.traverse(s => dataExtractor(s)))
-    } yield iol.take(5).map(println)
+    } yield iol.map(println) //iol.take(5).map(println)
 
       program.as(ExitCode.Success)
   }

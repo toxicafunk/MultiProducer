@@ -9,6 +9,7 @@ import monix.reactive.{Consumer, Observable}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import monix.execution.Callback
 
 object Main {
 
@@ -17,7 +18,7 @@ object Main {
 
   implicit val scheduler: Scheduler = monix.execution.Scheduler.global
 
-  def dataExtractor(line: String): Task[(Key, Option[DeviceType])] = Task {
+  def dataExtractor(line: String): (Key, Option[DeviceType]) = {
     val keyIdx = line.indexOf("id") + 5
     val deviceTypeIdx = line.indexOf("\"devicetype\":")
     val key = line.substring(keyIdx, keyIdx + 40)
@@ -36,23 +37,19 @@ object Main {
     Observable.fromLinesReader(reader)
   }
 
-  val ref: Atomic[Int] = Atomic(0)
-
   def main(args: Array[String]): Unit = {
     //val filename = args(0)
-    val filename = "just5k.json"
+    val filename = "just100k.json"
     val t0 = System.currentTimeMillis()
+
     val source = readFile(filename)
-      .map(line => {
-        ref.getAndTransform(_+1)
-        dataExtractor(line)
-      })
-      .consumeWith(Consumer.foreachParallel(8)(task => {
-        task.runToFuture(Scheduler.global).onComplete(_ => ref.getAndTransform(_-1))
+      .consumeWith(Consumer.foreachParallel(8)(line => {
+        val cancelable = Task(dataExtractor(line)).runAsync(Callback.fromTry(println))
       }))
-    val cancelable = source.runToFuture(Scheduler.global)
-    Await.result(cancelable, 2.minute)
-    while (ref.get() > 0) {}
+
+    //val cancelable = source.runToFuture(Scheduler.global)
+    //Await.result(cancelable, 2.minute)
+    source.runSyncUnsafe(5.seconds)
     val t1 = System.currentTimeMillis()
     println("Elapsed time: " + (t1 - t0) + "ms")
   }

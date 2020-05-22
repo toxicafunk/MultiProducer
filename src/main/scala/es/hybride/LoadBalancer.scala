@@ -15,12 +15,10 @@ object LoadBalancer {
     println(tup)
   })
 
-  val loadBalancer = {
-    Consumer
+  val loadBalancer = Consumer
       .loadBalance(parallelism = 10, extractorConsumer)
-  }
 
-val observable = readFile(filename)
+  val observable = readFile(filename)
 
   val task = observable.consumeWith(loadBalancer)
 

@@ -4,10 +4,17 @@ import cats.implicits._
 import scala.io.Source
 import cats.effect.{ExitCode, IO, IOApp}
 
-object MainCats extends IOApp {
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.BenchmarkMode
+import org.openjdk.jmh.annotations.Mode
+import org.openjdk.jmh.annotations.OutputTimeUnit
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import java.util.concurrent.TimeUnit
 
-  type Key = String
-  type DeviceType = String
+import es.hybride._
+
+object MainCats extends IOApp {
 
   def dataExtractor(line: String): IO[(Key, Option[DeviceType])] = IO {
     val keyIdx = line.indexOf("id") + 5
@@ -23,31 +30,22 @@ object MainCats extends IOApp {
     (key, deviceType)
   }
 
-  /*private def processList(lines: List[String]): IO[List[(Key, Option[DeviceType])]] =
-    IO(lines.map(dataExtractor))*/
-
   private def readFile(fileName: String): IO[List[String]] =
     IO(Source.fromFile(fileName).getLines().toList)
 
-  /*def main(args: Array[String]): Unit = {
-    val program = for {
-      iol <- readFile("just5k.json")
-      ext  <- iol.traverse(s => dataExtractor(s))
-    } yield {
-      ext.take(5).map(println)
-    }
-    program.unsafeRunSync()
-  }*/
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    val program = for {
-      iol <- readFile("just5k.json")
+  @Benchmark
+  @BenchmarkMode(Array(Mode.AverageTime))
+  @OutputTimeUnit(TimeUnit.MILLISECONDS)
+  def program(filename: String) =
+    for {
+      iol <- readFile(filename)
       ext <- iol.traverse(s => dataExtractor(s))
     } yield {
       ext.map(println)
-      //ext.take(5).map(println)
     }
 
-    program.as(ExitCode.Success)
+  override def run(args: List[String]): IO[ExitCode] = {
+    val filename = "just5k.json"
+    program(filename).as(ExitCode.Success)
   }
 }

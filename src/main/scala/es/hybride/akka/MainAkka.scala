@@ -18,6 +18,14 @@ import scala.util.{Failure, Success}
 import akka.stream._
 import akka.stream.scaladsl._
 
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.BenchmarkMode
+import org.openjdk.jmh.annotations.Mode
+import org.openjdk.jmh.annotations.OutputTimeUnit
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import java.util.concurrent.TimeUnit
+
 object MainAkka {
 
   type Key = ByteString
@@ -51,7 +59,7 @@ object MainAkka {
     allowTruncation = true
   )
 
-  val program: String => Future[Done] = (filename: String) =>
+  val stream: String => Future[Done] = (filename: String) =>
     source(filename)
       .via(lines)
       .map(line => dataExtractor(line))
@@ -61,16 +69,19 @@ object MainAkka {
         )
       )
 
+  @Benchmark
+  @BenchmarkMode(Array(Mode.AverageTime))
+  @OutputTimeUnit(TimeUnit.MILLISECONDS)
+  def program(filename: String): Unit =
+    stream(filename)
+      .andThen {
+        case Failure(t) => println(t)
+        case Success(v) => println("Done.")
+      }(ExecutionContext.global)
+
   def main(args: Array[String]): Unit = {
     //val filename = args(0)
     val filename = "just5k.json"
-    val t0 = System.currentTimeMillis()
     program(filename)
-      .andThen {
-        case Failure(t) => println(t)
-        case Success(v) =>
-          val t1 = System.currentTimeMillis()
-          println("Elapsed time: " + (t1 - t0) + "ms")
-      }(ExecutionContext.global)
   }
 }

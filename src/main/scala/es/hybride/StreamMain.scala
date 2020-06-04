@@ -2,7 +2,7 @@ package es.hybride
 
 import scala.collection.immutable
 import scala.io.Source
-import Main._
+import Main.{dataExtractor, proccessMessage}
 
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -22,7 +22,7 @@ class StreamMain {
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
-  def program(): Unit = readFile("just100k.json").foreach(Main.proccessMessage)
+  def program(): Unit = readFile("just100k.json").foreach(proccessMessage)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))
@@ -30,7 +30,7 @@ class StreamMain {
   def programPar(): Unit = readFile("just100k.json")
     .toList
     .par
-    .foreach(Main.proccessMessage)
+    .foreach(proccessMessage)
 }
 object StreamMain {
 
@@ -38,7 +38,6 @@ object StreamMain {
     val p = new StreamMain()
     //p.program()
     p.programPar()
-    println(s"Successes: $successes")
   }
 
 }

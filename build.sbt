@@ -5,6 +5,8 @@ version := "0.1"
 //scalaVersion := "2.13.1"
 scalaVersion := "2.12.11"
 
+val zioVersion        = "1.0.0-RC20"
+
 libraryDependencies ++= Seq(
   "org.apache.kafka" % "kafka-clients" % "2.5.0",
 
@@ -16,7 +18,10 @@ libraryDependencies ++= Seq(
   // optional I/O library
   "co.fs2" %% "fs2-io" % "2.2.1",
 
-  "io.monix" %% "monix" % "3.2.0"
+  "io.monix" %% "monix" % "3.2.0",
+
+  "dev.zio"       %% "zio"                    % zioVersion,
+  "dev.zio"       %% "zio-streams"            % zioVersion
 )
 
 scalacOptions ++= Seq(

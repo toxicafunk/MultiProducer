@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 //jmh:run -i 3 -wi 3 -f1 -t1 es.hybride.*.*
 class Main {
-  import Main._
+  import Main.{dataExtractor, proccessMessage}
 
   def readFile(fileName: String): Iterator[String] = //: List[(Key, Option[DeviceType])] =
     Source.fromFile(fileName).getLines()
@@ -52,36 +52,13 @@ class Main {
 
 object Main {
 
-  type Key = String
-  type DeviceType = String
-
-  val props = new ju.Properties()
-  props.put(
-    "bootstrap.servers",
-    "172.18.0.2:9092,172.18.0.4:9092,172.18.0.5:9092"
-  );
-  props.put("acks", "all");
-  props.put(
-    "key.serializer",
-    "org.apache.kafka.common.serialization.StringSerializer"
-  );
-  props.put(
-    "value.serializer",
-    "org.apache.kafka.common.serialization.StringSerializer"
-  );
-
-  val producer: Producer[String, String] = new KafkaProducer(props);
-
-  var successes = 0
-
   def send(key: String, msg: String): Future[RecordMetadata] =
     producer.send(new ProducerRecord[String, String]("my-topic", key, msg))
 
-  def proccessMessage(tup: (Key, Option[DeviceType])) = {
+  def proccessMessage(tup: (Key, Option[DeviceType])): Unit = {
     val msg = tup._2
     if (msg.isDefined) {
       val rmd: RecordMetadata = send(tup._1, msg.get).get(1, TimeUnit.SECONDS)
-      successes += 1
       println(s"${rmd.partition()} ${rmd.offset()}")
     } else ()
   }
@@ -104,7 +81,6 @@ object Main {
     val m = new Main()
     //m.program()
     m.programPar()
-    println(s"Successes: $successes")
   }
 
 }

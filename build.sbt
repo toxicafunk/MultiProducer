@@ -12,3 +12,10 @@ scalacOptions ++= Seq(
   "-language:higherKinds"
 )
  // "-Ypartial-unification")
+
+val zioVersion        = "1.0.0-RC20"
+
+libraryDependencies ++= Seq(
+  "dev.zio"       %% "zio"                    % zioVersion,
+  "dev.zio"       %% "zio-streams"            % zioVersion,
+)

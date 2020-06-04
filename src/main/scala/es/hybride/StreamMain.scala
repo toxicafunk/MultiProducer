@@ -12,12 +12,12 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 
 import java.util.concurrent.TimeUnit
-import scala.collection.parallel.CollectionConverters._
+//import scala.collection.parallel.CollectionConverters._
 
 class StreamMain {
 
-  def readFile(fileName: String): LazyList[(Key, Option[DeviceType])] =
-    Source.fromFile(fileName).getLines().to(LazyList).map(dataExtractor)
+  def readFile(fileName: String): Stream[(Key, Option[DeviceType])] =
+    Source.fromFile(fileName).getLines().toStream.map(dataExtractor)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))

@@ -18,7 +18,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
 import scala.util.Random
 
-import scala.collection.parallel.CollectionConverters._
+//import scala.collection.parallel.CollectionConverters._
 import java.util.concurrent.atomic.AtomicLongArray
 import java.util.concurrent.atomic.AtomicInteger
 

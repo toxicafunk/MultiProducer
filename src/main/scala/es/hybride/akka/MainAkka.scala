@@ -69,9 +69,9 @@ object MainAkka {
         )
       )
 
-  @Benchmark
-  @BenchmarkMode(Array(Mode.AverageTime))
-  @OutputTimeUnit(TimeUnit.MILLISECONDS)
+  //@Benchmark
+  //@BenchmarkMode(Array(Mode.AverageTime))
+  //@OutputTimeUnit(TimeUnit.MILLISECONDS)
   def program(filename: String): Unit =
     stream(filename)
       .andThen {

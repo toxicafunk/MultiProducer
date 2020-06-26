@@ -9,7 +9,9 @@ import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 import MainCats._
-import java.sql.Blob
+
+
+import es.hybride._
 
 object FS2Main extends IOApp {
   /*private val blockingExecutionContext =

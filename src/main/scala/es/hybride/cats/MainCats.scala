@@ -33,9 +33,9 @@ object MainCats extends IOApp {
   private def readFile(fileName: String): IO[List[String]] =
     IO(Source.fromFile(fileName).getLines().toList)
 
-  @Benchmark
-  @BenchmarkMode(Array(Mode.AverageTime))
-  @OutputTimeUnit(TimeUnit.MILLISECONDS)
+  //@Benchmark
+  //@BenchmarkMode(Array(Mode.AverageTime))
+  //@OutputTimeUnit(TimeUnit.MILLISECONDS)
   def program(filename: String) =
     for {
       iol <- readFile(filename)
